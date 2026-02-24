@@ -240,7 +240,7 @@ function App() {
           <Button className="w-full flex items-center justify-center min-h-[80px] text-xl" onClick={reset} disabled={isRunning && elapsedMs < 50}><FaStop /> Reset</Button>
           <Button className="w-full flex items-center justify-center min-h-[80px] text-xl" onClick={() => void beep()} ><AiTwotoneSound /> Test Beep </Button>
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-4 w-full">          
+        <div className="grid gap-4 mb-4 w-full" style={{ gridTemplateColumns: "2fr 1fr" }}>          
 
           <div className=''>
             {/* 

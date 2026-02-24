@@ -3,6 +3,7 @@ import { Button } from './components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
 import { AiTwotoneSound } from "react-icons/ai";
 import { FaPause,FaPlay, FaStop  } from "react-icons/fa";
+// import { markers } from './markers_2';
 import { markers } from './markers';
 
 function formatMs(ms: number): string {
@@ -95,6 +96,40 @@ function App() {
   const baseElapsedRef = useRef(0);
   const nextIndexRef = useRef(0);
 
+  const recomputeNextIndex = useCallback(
+    (newElapsed: number) => {
+      // console.log("🚀 ~ App ~ newElapsed:", newElapsed)
+      // console.log("🚀 ~ App ~ markerMs:", markerMs)
+      // first index where markerMs[i] > newElapsed
+      let i = 0;
+      while (i < markerMs.length && markerMs[i] <= newElapsed) i++;      
+      nextIndexRef.current = i;
+      setNextMarkerIndex(i);
+    },
+    [markerMs]
+  );
+
+  const seekTo = useCallback(
+    (newElapsed: number) => {      
+      // Clamp (optional)
+      const clamped = Math.max(0, newElapsed);      
+
+      // Set the "accumulated" elapsed baseline
+      baseElapsedRef.current = clamped;
+
+      // If running, restart the perf anchor so time continues smoothly from the new baseline
+      if (isRunning) {
+        startPerfRef.current = performance.now();
+      } else {
+        startPerfRef.current = null;
+      }
+
+      // Update UI + marker pointer (DO NOT beep on seek)
+      setElapsedMs(clamped);
+      recomputeNextIndex(clamped);
+    },
+    [isRunning, recomputeNextIndex]
+  );
 
   const tick = useCallback(() => {
     if (startPerfRef.current == null) return;
@@ -152,7 +187,13 @@ function App() {
     }
 
     setElapsedMs(baseElapsedRef.current);
-  }, [isRunning]);
+    recomputeNextIndex(baseElapsedRef.current);
+  }, [isRunning, recomputeNextIndex]);
+
+  const resetplay = useCallback(() => {
+    reset();
+    start();
+  }, [])
 
   const reset = useCallback(() => {
     // stop
@@ -244,12 +285,14 @@ function App() {
         <div className="text-4xl font-mono mb-4">
           {nextIndexRef.current}
         </div>        
-        */}        
+        <div>{nextIndexRef.current}</div>
+        */}
         <Table className="w-full">
           <TableHeader>
             <TableRow>
+              <TableHead></TableHead>
               <TableHead>Activities</TableHead>
-              <TableHead className="w-[100px]">Maximum</TableHead>
+              {/*<TableHead className="w-[100px]">Maximum</TableHead>*/}
               <TableHead className="w-[100px]">Average</TableHead>
             </TableRow>
           </TableHeader>
@@ -258,14 +301,16 @@ function App() {
               const curr = nextIndexRef.current;              
               return (
               <TableRow key={marker.activity} style={{ opacity:  i <= curr ? 1 : 0.5, backgroundColor: curr == i ? "rgba(34,197,94,0.2)" : "transparent" }}>
+                <TableCell><Button className="w-full p-1 m-0" onClick={() => i !== 0 ? seekTo(markerMs[i - 1]) : resetplay()}><FaPlay /></Button></TableCell>
                 <TableCell className="font-medium" style={{ opacity:  i <= curr ? 1 : 0.5 }}>{marker.activity} { i < curr ? "✓" : ""}</TableCell>
-                <TableCell>{marker.maximum} min</TableCell>
+                {/*<TableCell>{marker.maximum} min</TableCell>*/}
                 <TableCell>{marker.average} min</TableCell>
               </TableRow>
             )})}
-            <TableRow key={'Total'} style={{ opacity: 0.5 }}>
+            <TableRow key={'Total'} style={{ opacity: 0.5 }}>                
                 <TableCell className="font-medium font-bold">Total</TableCell>
-                <TableCell>{Math.round(markers.reduce((acc: any, marker: any) => acc + marker.maximum, 0))} min</TableCell>
+                <TableCell></TableCell>
+                {/*<TableCell>{Math.round(markers.reduce((acc: any, marker: any) => acc + marker.maximum, 0))} min</TableCell>*/}
                 <TableCell>{Math.round(markers.reduce((acc: any, marker: any) => acc + marker.average, 0))} min</TableCell>
               </TableRow>
           </TableBody>

@@ -10,6 +10,9 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm ci
 
+# Copy files
+COPY . .
+
 # Set host to allow external connections
 ENV VITE_HOST=0.0.0.0
 

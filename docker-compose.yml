@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile # Specify the Dockerfile name
     image: timer:latest # Name the built image
     container_name: timer # Name the running container
-    #ports:      
-    #  - 4321:4321 # Map port 4321 of the container to port 4321 on the host
+    #ports:
+    #  - 5173:5173
     restart: unless-stopped # Restart policy
     networks:
       - apps
@@ -18,6 +18,6 @@ services:
       - "traefik.http.routers.timer.rule=Host(`timer.${DOMAIN}`)"      
       - "traefik.http.services.timer.loadbalancer.server.port=5173"
 
-  networks:
-    apps:
-      external: true
+networks:
+  apps:
+    external: true

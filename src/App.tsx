@@ -240,7 +240,7 @@ function App() {
           <Button className="w-full flex items-center justify-center min-h-[80px] text-xl" onClick={reset} disabled={isRunning && elapsedMs < 50}><FaStop /> Reset</Button>
           <Button className="w-full flex items-center justify-center min-h-[80px] text-xl" onClick={() => void beep()} ><AiTwotoneSound /> Test Beep </Button>
         </div>
-        <div className="grid gap-4 mb-4 w-full" style={{ gridTemplateColumns: "2fr 1fr" }}>          
+        <div className="grid gap-4 mb-4 w-full" style={{ gridTemplateColumns: "3fr 1fr" }}>          
 
           <div className=''>
             {/* 
@@ -275,7 +275,7 @@ function App() {
 
           <div className=''>
             <div className="text-md opacity-70 mb-4 text-right">Total</div>
-            <div className="text-3xl opacity-70 font-mono mb-4 text-right">
+            <div className="text-2xl opacity-70 font-mono mb-4 text-right">
               {formatMs(elapsedMs)}
             </div>
           </div>
